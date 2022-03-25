@@ -77,6 +77,7 @@ def verify_conv2d_common(
     run_benchmark=False,
 ):
     if not has_cutlass():
+        print("CUTLASS not detected\n")
         return
 
     typ = relay.transform.InferType()(mod_nhwc)
@@ -99,10 +100,12 @@ def verify_conv2d_common(
     ref_out = get_output(rt_mod_ref, input_names, inputs)
 
     cutlass_time = rt_mod.benchmark(dev, number=1, repeat=600).mean * 1000
+
     cudnn_time = rt_mod_ref.benchmark(dev, number=1, repeat=600).mean * 1000
-    # cutlass_time = 0
-    # cudnn_time = 0
+    cutlass_time = 0
+    cudnn_time = 0
     print("Max and mean abs diff:", np.max(np.abs(out - ref_out)), np.mean(np.abs(out - ref_out)))
+    
     return cutlass_time, cudnn_time
     # return np.max(np.abs(out - ref_out)), np.mean(np.abs(out - ref_out))
 
@@ -190,10 +193,10 @@ def get_workloads():
 
 
 def get_conv2d_nhwc(
-    d_shape, w_shape, pad_h, pad_w, stride_h, stride_w, out_dtype="float16"
+    d_shape, w_shape, pad_h, pad_w, stride_h, stride_w, out_dtype="float16", dtype="float16"
 ):
-    data = relay.var("data", shape=d_shape, dtype="float16")
-    weight = relay.var("weight", shape=w_shape, dtype="float16")
+    data = relay.var("data", shape=d_shape, dtype=dtype)
+    weight = relay.var("weight", shape=w_shape, dtype=dtype)
     out_channel = w_shape[0]
     return tvm.IRModule.from_expr(
         relay.nn.conv2d(
@@ -210,9 +213,8 @@ def get_conv2d_nhwc(
     )
 
 
-def test_conv2d():
-    out_dtype = "float16"
-
+def test_conv2d(dtype="float16", out_dtype = "float16"):
+    
     for workload in get_workloads():
         print(workload, end=",")
         d_shape = (workload["n"], workload["h"], workload["w"], workload["c"])
@@ -225,6 +227,7 @@ def test_conv2d():
             workload["stride_h"],
             workload["stride_w"],
             out_dtype,
+            dtype
         )
 
         verify_conv2d(
@@ -375,5 +378,8 @@ def test_conv2d_wgrad():
         print(workload, ",", cutlass_time, ",", cudnn_time)
 
 
-# test_conv2d()
-test_conv2d_wgrad()
+if __name__=="__main__":
+    # This works with dtype: float16 and out_dtype: float16/ float32
+    # Defaulting to CUDA core schedules needs more investigation
+    test_conv2d(dtype="float32", out_dtype = "float32")
+    # test_conv2d_wgrad()
