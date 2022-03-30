@@ -27,7 +27,7 @@ def get_output(rt_mod, names, inputs):
 
 
 def profile_and_build(
-    mod, params, sm, split_k_slices=[1], tmp_dir="./tmp", lib_path="compile.so"
+    mod, params, sm, split_k_slices=[1], tmp_dir="./tmp", lib_path="compile.so", use_multiprocessing=False
 ):
     # params : dict of str to NDArray
     # Input parameters to the graph that do not change
@@ -41,7 +41,7 @@ def profile_and_build(
         sm,
         split_k_slices=split_k_slices,
         find_first_valid=False,
-        use_multiprocessing=True,
+        use_multiprocessing=use_multiprocessing,
         tmp_dir=tmp_dir,
     )
     with tvm.transform.PassContext(opt_level=3):
@@ -52,7 +52,8 @@ def profile_and_build(
     return mod, rt_mod, dev, num_cutlass_partition
 
 
-def verify_GEMM(mod_GEMM, params, input_names, inputs, sm=75, split_k_slices=[1], filename="best_dense_gemm_schedule.txt"):
+def verify_GEMM(mod_GEMM, params, input_names, inputs, sm=75, split_k_slices=[1],
+    filename="best_dense_gemm_schedule.txt", use_multiprocessing=False):
     # Setting default sm to 75 for cloud AWS system
 
     # Input parameters to the graph that do not change
@@ -68,7 +69,7 @@ def verify_GEMM(mod_GEMM, params, input_names, inputs, sm=75, split_k_slices=[1]
     # print("oshape:", typ["main"].body.checked_type.shape)
 
     best_mod, rt_mod, dev, num_cutlass_partition = profile_and_build(
-        mod_GEMM, params, sm, split_k_slices
+        mod_GEMM, params, sm, split_k_slices, use_multiprocessing=use_multiprocessing
     )
     
     # console has a warning when exporting astext(); can be ignored
@@ -112,7 +113,7 @@ def get_GEMM(shape_a, shape_b, in_dtype="float16", out_dtype="float16"):
             out_dtype=out_dtype)
             )
 
-def Benchmark_GEMM(sm_num, shape_a, shape_b, filename, in_dtype="float16", out_dtype="float16"):
+def Benchmark_GEMM(sm_num, shape_a, shape_b, filename, in_dtype="float16", out_dtype="float16", use_multiprocessing=False):
     mod_GEMM = get_GEMM(shape_a=shape_a, shape_b=shape_b, in_dtype=in_dtype, out_dtype=out_dtype)
 
     np_data = np.random.uniform(-1, 1, shape_a).astype(in_dtype)
@@ -122,17 +123,18 @@ def Benchmark_GEMM(sm_num, shape_a, shape_b, filename, in_dtype="float16", out_d
     inputs = [np_data]
     split_k_slices = [1]
 
-    verify_GEMM(mod_GEMM, params, input_names, inputs, sm=sm_num, split_k_slices=split_k_slices, filename=filename)
+    verify_GEMM(mod_GEMM, params, input_names, inputs, sm=sm_num, split_k_slices=split_k_slices, filename=filename, use_multiprocessing=use_multiprocessing)
 
 if __name__=="__main__":
-    sm_num = 80
-    M = 2048
-    N = 2048
-    K = 2048
-
+    sm_num = 75
+    M = 1024
+    N = 1024
+    K = 1024
+    use_multiprocessing = False
+    
     shape_a = (M, K)
     shape_b = (K, N)
 
     filename = "SM_" + str(sm_num) + "_" + "best_dense_gemm_schedule_" + str(M) + "_" + str(N) + "_" + str(K) + ".txt"
 
-    Benchmark_GEMM(sm_num, shape_a, shape_b, filename=filename, in_dtype="float32", out_dtype="float32")
+    Benchmark_GEMM(sm_num, shape_a, shape_b, filename=filename, in_dtype="float32", out_dtype="float32", use_multiprocessing=use_multiprocessing)

@@ -32,16 +32,16 @@ void tvmgen_default_cutlass_main_0_(DLTensor* cutlass_0_i0, DLTensor* cutlass_0_
   using ElementOutput = float;
   using ElementComputeEpilogue = float;
   
-  // Gemm operator cutlass_tensorop_s1688gemm_128x128_16x3_tn_align4
-  using Operation_cutlass_tensorop_s1688gemm_128x128_16x3_tn_align4 = cutlass::gemm::device::Gemm<
+  // Gemm operator cutlass_tensorop_s1688gemm_64x64_16x3_tn_align4
+  using Operation_cutlass_tensorop_s1688gemm_64x64_16x3_tn_align4 = cutlass::gemm::device::Gemm<
     float, cutlass::layout::RowMajor,
     float, cutlass::layout::ColumnMajor,
     float, cutlass::layout::RowMajor,
     float,
     cutlass::arch::OpClassTensorOp,
     cutlass::arch::Sm80,
-    cutlass::gemm::GemmShape<128, 128, 16>,
-    cutlass::gemm::GemmShape<32, 64, 16>,
+    cutlass::gemm::GemmShape<64, 64, 16>,
+    cutlass::gemm::GemmShape<32, 32, 16>,
     cutlass::gemm::GemmShape<16, 8, 8>,
     
     cutlass::epilogue::thread::LinearCombination<
@@ -57,10 +57,10 @@ void tvmgen_default_cutlass_main_0_(DLTensor* cutlass_0_i0, DLTensor* cutlass_0_
     false,
     cutlass::arch::OpMultiplyAddFastF32
   >;
-  using Gemm = Operation_cutlass_tensorop_s1688gemm_128x128_16x3_tn_align4;
-  int M = 2048;
-  int N = 2048;
-  int K = 2048;
+  using Gemm = Operation_cutlass_tensorop_s1688gemm_64x64_16x3_tn_align4;
+  int M = 1024;
+  int N = 1024;
+  int K = 1024;
   cutlass::gemm::GemmCoord problem_size(M, N, K);
   ElementComputeEpilogue alpha = ElementComputeEpilogue(1);
   ElementComputeEpilogue beta = ElementComputeEpilogue(0);
