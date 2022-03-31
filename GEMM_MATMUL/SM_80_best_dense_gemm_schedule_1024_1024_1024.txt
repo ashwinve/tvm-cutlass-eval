@@ -3,31 +3,31 @@ def @main(%data: Tensor[(1024, 1024), float32], %weight: Tensor[(1024, 1024), fl
   @tvmgen_default_cutlass_main_0(%data, %weight) /* ty=Tensor[(1024, 1024), float32] */
 }
 
-def @tvmgen_default_cutlass_main_0(%cutlass_0_i0: Tensor[(1024, 1024), float32], %cutlass_0_i1: Tensor[(1024, 1024), float32], Inline=1, arg1_shape=[1024, 1024], op_type="cutlass.dense", arg0_dtype="float32", Compiler="cutlass", ret_dtype="float32", ldb="K", global_symbol="tvmgen_default_cutlass_main_0", lda="K", Primitive=1, cutlass_op_name="cutlass_tensorop_s1688gemm_64x64_16x3_tn_align4", ldc="N", cutlass_op_def="
-  // Gemm operator cutlass_tensorop_s1688gemm_64x64_16x3_tn_align4
-  using Operation_cutlass_tensorop_s1688gemm_64x64_16x3_tn_align4 = cutlass::gemm::device::Gemm<
+def @tvmgen_default_cutlass_main_0(%cutlass_0_i0: Tensor[(1024, 1024), float32], %cutlass_0_i1: Tensor[(1024, 1024), float32], Inline=1, arg1_shape=[1024, 1024], op_type="cutlass.dense", arg0_dtype="float32", Compiler="cutlass", ret_dtype="float32", ldb="K", global_symbol="tvmgen_default_cutlass_main_0", lda="K", Primitive=1, cutlass_op_name="cutlass_simt_sgemm_64x64_8x2_tn_align1", ldc="N", cutlass_op_def="
+  // Gemm operator cutlass_simt_sgemm_64x64_8x2_tn_align1
+  using Operation_cutlass_simt_sgemm_64x64_8x2_tn_align1 = cutlass::gemm::device::Gemm<
     float, cutlass::layout::RowMajor,
     float, cutlass::layout::ColumnMajor,
     float, cutlass::layout::RowMajor,
     float,
-    cutlass::arch::OpClassTensorOp,
-    cutlass::arch::Sm80,
-    cutlass::gemm::GemmShape<64, 64, 16>,
-    cutlass::gemm::GemmShape<32, 32, 16>,
-    cutlass::gemm::GemmShape<16, 8, 8>,
+    cutlass::arch::OpClassSimt,
+    cutlass::arch::Sm75,
+    cutlass::gemm::GemmShape<64, 64, 8>,
+    cutlass::gemm::GemmShape<32, 64, 8>,
+    cutlass::gemm::GemmShape<1, 1, 1>,
     
     cutlass::epilogue::thread::LinearCombination<
       float,
-      4,
+      1,
       float,
       float
     >,
     cutlass::gemm::threadblock::GemmIdentityThreadblockSwizzle<8>,
-    3,
-    4,
-    4,
+    2,
+    1,
+    1,
     false,
-    cutlass::arch::OpMultiplyAddFastF32
+    cutlass::arch::OpMultiplyAdd
   >;
 ", ret_shape=[1024, 1024], arg1_dtype="float32", arg0_shape=[1024, 1024]) -> Tensor[(1024, 1024), float32] {
   %0 = fn (%FunctionVar_0_0: Tensor[(1024, 1024), float32], %FunctionVar_0_1: Tensor[(1024, 1024), float32], PartitionedFromPattern="nn.dense_", Composite="cutlass.dense") -> Tensor[(1024, 1024), float32] {
