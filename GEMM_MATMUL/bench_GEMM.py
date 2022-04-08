@@ -28,7 +28,7 @@ def get_output(rt_mod, names, inputs):
 
 def profile_and_build(
     mod, params, sm, split_k_slices=[1], tmp_dir="./tmp", lib_path="compile.so", use_multiprocessing=False,
-    USETENSORCORE=True
+    BENCHMARK_TRIALS=1, USETENSORCORE=True
 ):
     # params : dict of str to NDArray
     # Input parameters to the graph that do not change
@@ -44,6 +44,7 @@ def profile_and_build(
         find_first_valid=False,
         use_multiprocessing=use_multiprocessing,
         tmp_dir=tmp_dir,
+        BENCHMARK_TRIALS=BENCHMARK_TRIALS,
         USETENSORCORE=USETENSORCORE
     )
     with tvm.transform.PassContext(opt_level=3):
@@ -55,7 +56,7 @@ def profile_and_build(
 
 
 def verify_GEMM(mod_GEMM, params, input_names, inputs, sm=75, split_k_slices=[1],
-    filename="best_dense_gemm_schedule.txt", use_multiprocessing=False, USETENSORCORE=True):
+    filename="best_dense_gemm_schedule.txt", use_multiprocessing=False, BENCHMARK_TRIALS=1, USETENSORCORE=True):
     # Setting default sm to 75 for cloud AWS system
 
     # Input parameters to the graph that do not change
@@ -72,7 +73,7 @@ def verify_GEMM(mod_GEMM, params, input_names, inputs, sm=75, split_k_slices=[1]
 
     best_mod, rt_mod, dev, num_cutlass_partition = profile_and_build(
         mod_GEMM, params, sm, split_k_slices, use_multiprocessing=use_multiprocessing,
-        USETENSORCORE=USETENSORCORE
+        BENCHMARK_TRIALS=BENCHMARK_TRIALS, USETENSORCORE=USETENSORCORE
     )
     
     # console has a warning when exporting astext(); can be ignored
@@ -85,7 +86,7 @@ def verify_GEMM(mod_GEMM, params, input_names, inputs, sm=75, split_k_slices=[1]
     out = get_output(rt_mod, input_names, inputs)
 
     # assert num_cutlass_partition > 0
-
+    
     cutlass_time = rt_mod.benchmark(dev, number=1, repeat=1000).mean * 1000
     print("GEMM CUTLASS Time: ", cutlass_time, " ms")
     
@@ -117,7 +118,8 @@ def get_GEMM(shape_a, shape_b, in_dtype="float16", out_dtype="float16"):
             )
 
 def Benchmark_GEMM(sm_num, shape_a, shape_b, filename,
-                    in_dtype="float16", out_dtype="float16", use_multiprocessing=False, USETENSORCORE=True):
+                    in_dtype="float16", out_dtype="float16", use_multiprocessing=False,
+                    BENCHMARK_TRIALS=1, USETENSORCORE=True):
 
     if not(USETENSORCORE):
         assert in_dtype=="float32" and out_dtype=="float32"
@@ -132,7 +134,7 @@ def Benchmark_GEMM(sm_num, shape_a, shape_b, filename,
     split_k_slices = [1]
 
     verify_GEMM(mod_GEMM, params, input_names, inputs, sm=sm_num, split_k_slices=split_k_slices,
-                filename=filename, use_multiprocessing=use_multiprocessing, USETENSORCORE=USETENSORCORE)
+                filename=filename, use_multiprocessing=use_multiprocessing, BENCHMARK_TRIALS=BENCHMARK_TRIALS, USETENSORCORE=USETENSORCORE)
 
 if __name__=="__main__":
     sm_num = 75
@@ -140,14 +142,17 @@ if __name__=="__main__":
     N = 1024
     K = 1024
     use_multiprocessing = False
+    BENCHMARK_TRIALS = 1
 
     shape_a = (M, K)
     shape_b = (K, N)
-    print("Measuring for (M,N,K): (" + str(M) + "," +  str(N) + "," + str(K))
+    
     filename = "SM_" + str(sm_num) + "_" + "best_dense_gemm_schedule_" + str(M) + "_" + str(N) + "_" + str(K) + ".txt"
 
     USETENSORCORE = False
     
+    print("Measuring for (M,N,K): (" + str(M) + "," +  str(N) + "," + str(K) + ")")
+
     Benchmark_GEMM(sm_num, shape_a, shape_b, filename=filename,
                     in_dtype="float32", out_dtype="float32", use_multiprocessing=use_multiprocessing,
-                    USETENSORCORE=USETENSORCORE)
+                    BENCHMARK_TRIALS=BENCHMARK_TRIALS, USETENSORCORE=USETENSORCORE)

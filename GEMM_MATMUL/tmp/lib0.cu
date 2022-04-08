@@ -32,15 +32,15 @@ void tvmgen_default_cutlass_main_0_(DLTensor* cutlass_0_i0, DLTensor* cutlass_0_
   using ElementOutput = float;
   using ElementComputeEpilogue = float;
   
-  // Gemm operator cutlass_simt_sgemm_64x128_8x2_tn_align1
-  using Operation_cutlass_simt_sgemm_64x128_8x2_tn_align1 = cutlass::gemm::device::Gemm<
+  // Gemm operator cutlass_simt_sgemm_64x64_8x2_tn_align1
+  using Operation_cutlass_simt_sgemm_64x64_8x2_tn_align1 = cutlass::gemm::device::Gemm<
     float, cutlass::layout::RowMajor,
     float, cutlass::layout::ColumnMajor,
     float, cutlass::layout::RowMajor,
     float,
     cutlass::arch::OpClassSimt,
     cutlass::arch::Sm75,
-    cutlass::gemm::GemmShape<64, 128, 8>,
+    cutlass::gemm::GemmShape<64, 64, 8>,
     cutlass::gemm::GemmShape<32, 64, 8>,
     cutlass::gemm::GemmShape<1, 1, 1>,
     
@@ -57,7 +57,7 @@ void tvmgen_default_cutlass_main_0_(DLTensor* cutlass_0_i0, DLTensor* cutlass_0_
     false,
     cutlass::arch::OpMultiplyAdd
   >;
-  using Gemm = Operation_cutlass_simt_sgemm_64x128_8x2_tn_align1;
+  using Gemm = Operation_cutlass_simt_sgemm_64x64_8x2_tn_align1;
   int M = 1024;
   int N = 1024;
   int K = 1024;
