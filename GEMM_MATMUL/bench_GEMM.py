@@ -86,8 +86,8 @@ def verify_GEMM(mod_GEMM, params, input_names, inputs, sm=75, split_k_slices=[1]
 
     # assert num_cutlass_partition > 0
 
-    cutlass_time = rt_mod.benchmark(dev, number=1, repeat=600).mean * 1000
-    print("GEMM CUTLASS Time: ", cutlass_time)
+    cutlass_time = rt_mod.benchmark(dev, number=1, repeat=1000).mean * 1000
+    print("GEMM CUTLASS Time: ", cutlass_time, " ms")
     
     return cutlass_time
 
@@ -135,7 +135,7 @@ def Benchmark_GEMM(sm_num, shape_a, shape_b, filename,
                 filename=filename, use_multiprocessing=use_multiprocessing, USETENSORCORE=USETENSORCORE)
 
 if __name__=="__main__":
-    sm_num = 80
+    sm_num = 75
     M = 1024
     N = 1024
     K = 1024
@@ -143,7 +143,7 @@ if __name__=="__main__":
 
     shape_a = (M, K)
     shape_b = (K, N)
-
+    print("Measuring for (M,N,K): (" + str(M) + "," +  str(N) + "," + str(K))
     filename = "SM_" + str(sm_num) + "_" + "best_dense_gemm_schedule_" + str(M) + "_" + str(N) + "_" + str(K) + ".txt"
 
     USETENSORCORE = False

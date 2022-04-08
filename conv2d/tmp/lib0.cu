@@ -28,30 +28,30 @@
 void tvmgen_default_cutlass_main_0_(DLTensor* cutlass_0_i0, DLTensor* cutlass_0_i1, DLTensor* out0) {
 
     
-  // Conv2dFprop Optimized kernel instance "cutlass_tensorop_s16816fprop_optimized_f16_128x128_32x3_nhwc_align8"
-  using cutlass_tensorop_s16816fprop_optimized_f16_128x128_32x3_nhwc_align8 =
+  // Conv2dFprop Optimized kernel instance "cutlass_tensorop_h1688fprop_optimized_256x128_32x2_nhwc_align8"
+  using cutlass_tensorop_h1688fprop_optimized_256x128_32x2_nhwc_align8 =
   typename cutlass::conv::kernel::DefaultConv2dFprop<
     cutlass::half_t,
     cutlass::layout::TensorNHWC,
     cutlass::half_t,
     cutlass::layout::TensorNHWC,
-    float,
+    cutlass::half_t,
     cutlass::layout::TensorNHWC,
-    float,
+    cutlass::half_t,
     cutlass::arch::OpClassTensorOp,
-    cutlass::arch::Sm80,
-    cutlass::gemm::GemmShape<128, 128, 32>,
+    cutlass::arch::Sm75,
+    cutlass::gemm::GemmShape<256, 128, 32>,
     cutlass::gemm::GemmShape<64, 64, 32 >,
-    cutlass::gemm::GemmShape<16, 8, 16>,
+    cutlass::gemm::GemmShape<16, 8, 8>,
     
     cutlass::epilogue::thread::LinearCombination<
-      float,
-      4,
-      float,
-      float
+      cutlass::half_t,
+      8,
+      cutlass::half_t,
+      cutlass::half_t
     >,
     cutlass::gemm::threadblock::GemmIdentityThreadblockSwizzle<4>, // cutlass::gemm::threadblock::GemmSplitKIdentityThreadblockSwizzle<>,
-    3,
+    2,
     cutlass::arch::OpMultiplyAdd,
     cutlass::conv::IteratorAlgorithm::kOptimized,
     cutlass::conv::StrideSupport::kStrided,
@@ -60,22 +60,22 @@ void tvmgen_default_cutlass_main_0_(DLTensor* cutlass_0_i0, DLTensor* cutlass_0_
   >::Kernel;
 
   
-  using Operation_cutlass_tensorop_s16816fprop_optimized_f16_128x128_32x3_nhwc_align8 = cutlass::conv::device::ImplicitGemmConvolution<cutlass_tensorop_s16816fprop_optimized_f16_128x128_32x3_nhwc_align8>;
-  using Conv2d = Operation_cutlass_tensorop_s16816fprop_optimized_f16_128x128_32x3_nhwc_align8;
+  using Operation_cutlass_tensorop_h1688fprop_optimized_256x128_32x2_nhwc_align8 = cutlass::conv::device::ImplicitGemmConvolution<cutlass_tensorop_h1688fprop_optimized_256x128_32x2_nhwc_align8>;
+  using Conv2d = Operation_cutlass_tensorop_h1688fprop_optimized_256x128_32x2_nhwc_align8;
   using ElementInputA = Conv2d::ElementA;
   using ElementInputB = Conv2d::ElementB;
   using ElementComputeEpilogue = Conv2d::ElementAccumulator;
   int N = 256;
-  int H = 14;
-  int W = 14;
-  int C = 256;
+  int H = 56;
+  int W = 56;
+  int C = 64;
   int K = 256;
-  int R = 3;
-  int S = 3;
-  int P = 14;
-  int Q = 14;
-  int pad_h = 1;
-  int pad_w = 1;
+  int R = 1;
+  int S = 1;
+  int P = 56;
+  int Q = 56;
+  int pad_h = 0;
+  int pad_w = 0;
   int stride_h = 1;
   int stride_w = 1;
   int dilation_h = 1;

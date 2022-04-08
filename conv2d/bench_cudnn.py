@@ -381,5 +381,5 @@ def test_conv2d_wgrad():
 if __name__=="__main__":
     # This works with dtype: float16 and out_dtype: float16/ float32
     # Defaulting to CUDA core schedules needs more investigation
-    test_conv2d(dtype="float32", out_dtype = "float32")
+    test_conv2d(dtype="float16", out_dtype = "float16")
     # test_conv2d_wgrad()
