@@ -47,7 +47,7 @@ def profile_and_build(
         BENCHMARK_TRIALS=BENCHMARK_TRIALS,
         USETENSORCORE=USETENSORCORE
     )
-    with tvm.transform.PassContext(opt_level=3):
+    with tvm.transform.PassContext(opt_level=0):
         lib = relay.build(mod, target="cuda", params=params)
     lib = build_cutlass_kernels(lib, sm, tmp_dir, lib_path)
     dev = tvm.device("cuda", 0)
@@ -83,14 +83,13 @@ def verify_GEMM(mod_GEMM, params, input_names, inputs, sm=75, split_k_slices=[1]
         outfile.writelines(exported_schedule_string)
     # print(best_mod)
     # Ashwin: Useful??
-    out = get_output(rt_mod, input_names, inputs)
+    #out = get_output(rt_mod, input_names, inputs)
 
     # assert num_cutlass_partition > 0
-    
-    cutlass_time = rt_mod.benchmark(dev, number=1, repeat=1000).mean * 1000
+    cutlass_time = rt_mod.benchmark(dev, number=1, repeat=BENCHMARK_TRIALS).mean * 1000
     print("GEMM CUTLASS Time: ", cutlass_time, " ms")
     
-    return cutlass_time
+    return 0 #cutlass_time
 
 
 def get_GEMM(shape_a, shape_b, in_dtype="float16", out_dtype="float16"):
@@ -138,11 +137,11 @@ def Benchmark_GEMM(sm_num, shape_a, shape_b, filename,
 
 if __name__=="__main__":
     sm_num = 75
-    M = 1024
-    N = 1024
-    K = 1024
+    M = 2048
+    N = M
+    K = M
     use_multiprocessing = False
-    BENCHMARK_TRIALS = 1
+    BENCHMARK_TRIALS = 10
 
     shape_a = (M, K)
     shape_b = (K, N)

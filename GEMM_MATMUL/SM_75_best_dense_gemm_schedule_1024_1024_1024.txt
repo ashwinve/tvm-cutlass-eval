@@ -3,17 +3,17 @@ def @main(%data: Tensor[(1024, 1024), float32], %weight: Tensor[(1024, 1024), fl
   @tvmgen_default_cutlass_main_0(%data, %weight) /* ty=Tensor[(1024, 1024), float32] */
 }
 
-def @tvmgen_default_cutlass_main_0(%cutlass_0_i0: Tensor[(1024, 1024), float32], %cutlass_0_i1: Tensor[(1024, 1024), float32], Inline=1, arg1_shape=[1024, 1024], op_type="cutlass.dense", arg0_dtype="float32", Compiler="cutlass", ret_dtype="float32", ldb="K", global_symbol="tvmgen_default_cutlass_main_0", lda="K", Primitive=1, cutlass_op_name="cutlass_simt_sgemm_64x64_8x2_tn_align1", ldc="N", cutlass_op_def="
-  // Gemm operator cutlass_simt_sgemm_64x64_8x2_tn_align1
-  using Operation_cutlass_simt_sgemm_64x64_8x2_tn_align1 = cutlass::gemm::device::Gemm<
+def @tvmgen_default_cutlass_main_0(%cutlass_0_i0: Tensor[(1024, 1024), float32], %cutlass_0_i1: Tensor[(1024, 1024), float32], Inline=1, arg1_shape=[1024, 1024], op_type="cutlass.dense", arg0_dtype="float32", Compiler="cutlass", ret_dtype="float32", ldb="K", global_symbol="tvmgen_default_cutlass_main_0", lda="K", Primitive=1, cutlass_op_name="cutlass_simt_sgemm_512x64_8x2_8x1x1_tn_align1", ldc="N", cutlass_op_def="
+  // Gemm operator cutlass_simt_sgemm_512x64_8x2_8x1x1_tn_align1
+  using Operation_cutlass_simt_sgemm_512x64_8x2_8x1x1_tn_align1 = cutlass::gemm::device::Gemm<
     float, cutlass::layout::RowMajor,
     float, cutlass::layout::ColumnMajor,
     float, cutlass::layout::RowMajor,
     float,
     cutlass::arch::OpClassSimt,
     cutlass::arch::Sm75,
+    cutlass::gemm::GemmShape<512, 64, 8>,
     cutlass::gemm::GemmShape<64, 64, 8>,
-    cutlass::gemm::GemmShape<32, 64, 8>,
     cutlass::gemm::GemmShape<1, 1, 1>,
     
     cutlass::epilogue::thread::LinearCombination<
